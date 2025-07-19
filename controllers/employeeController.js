@@ -1,19 +1,22 @@
 const db = require("../db");
 const bcrypt = require("bcrypt");
 
-exports.getAllEmployees = (req, res) => {
-  db.query(
-    `SELECT e.*, d.name AS department 
-    FROM employees e
-    LEFT JOIN departments d ON e.department_id = d.id
-    ORDER BY e.registered_date DESC`,
-    (err, results) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(results);
-    }
-  );
+// Get all employees
+exports.getAllEmployees = async (req, res) => {
+  try {
+    const [results] = await db.query(
+      `SELECT e.*, d.name AS department 
+       FROM employees e
+       LEFT JOIN departments d ON e.department_id = d.id
+       ORDER BY e.registered_date DESC`
+    );
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
+// Create employee
 exports.createEmployee = async (req, res) => {
   const {
     employee_code,
@@ -35,30 +38,16 @@ exports.createEmployee = async (req, res) => {
   const nameRegex = /^[a-zA-Z]{2,30}$/;
   const phoneRegex = /^[0-9]{10}$/;
 
-  if (
-    !employee_code ||
-    !first_name ||
-    !email ||
-    !password ||
-    !gender ||
-    !department_id ||
-    !mobile_number
-  ) {
-    return res
-      .status(400)
-      .json({ message: "All required fields must be filled" });
+  if (!employee_code || !first_name || !email || !password || !gender || !department_id || !mobile_number) {
+    return res.status(400).json({ message: "All required fields must be filled" });
   }
 
   if (!nameRegex.test(first_name)) {
-    return res
-      .status(400)
-      .json({ message: "First name must be 2–30 alphabetic characters" });
+    return res.status(400).json({ message: "First name must be 2–30 alphabetic characters" });
   }
 
   if (last_name && !nameRegex.test(last_name)) {
-    return res
-      .status(400)
-      .json({ message: "Last name must be alphabetic (if provided)" });
+    return res.status(400).json({ message: "Last name must be alphabetic (if provided)" });
   }
 
   if (!emailRegex.test(email)) {
@@ -66,36 +55,29 @@ exports.createEmployee = async (req, res) => {
   }
 
   if (password.length < 6) {
-    return res
-      .status(400)
-      .json({ message: "Password must be at least 6 characters long" });
+    return res.status(400).json({ message: "Password must be at least 6 characters long" });
   }
 
   if (!["Male", "Female", "Other"].includes(gender)) {
-    return res
-      .status(400)
-      .json({ message: "Gender must be Male, Female or Other" });
+    return res.status(400).json({ message: "Gender must be Male, Female or Other" });
   }
 
   if (!phoneRegex.test(mobile_number)) {
-    return res
-      .status(400)
-      .json({ message: "Invalid mobile number. Must be 10 digits" });
+    return res.status(400).json({ message: "Invalid mobile number. Must be 10 digits" });
   }
 
   try {
-    // First insert into employees table
     const empSql = `
       INSERT INTO employees
       (employee_code, first_name, last_name, email, password, gender, department_id, city, mobile_number, birth_date, country, address)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
     const empValues = [
       employee_code,
       first_name,
       last_name,
       email,
-      password, // plaintext in employees
+      password, // Store plaintext password in employees table
       gender,
       department_id,
       city,
@@ -105,59 +87,39 @@ exports.createEmployee = async (req, res) => {
       address,
     ];
 
-    db.query(empSql, empValues, async (err, result) => {
-      if (err) return res.status(500).json({ error: err.message });
+    const [empResult] = await db.query(empSql, empValues);
+    const employeeId = empResult.insertId;
 
-      const employeeId = result.insertId;
-      const username = `${first_name} ${last_name || ""}`;
-      const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const username = `${first_name} ${last_name || ""}`.trim();
 
-      const userSql = `
-        INSERT INTO users (id, username, password, role, created_at, profile_image)
-        VALUES (?, ?, ?, ?, NOW(), ?)`;
+    const userSql = `
+      INSERT INTO users (id, username, password, role, created_at, profile_image)
+      VALUES (?, ?, ?, ?, NOW(), ?)
+    `;
+    await db.query(userSql, [employeeId, username, hashedPassword, "Employee", profile_image || null]);
 
-      db.query(
-        userSql,
-        [
-          employeeId,
-          username,
-          hashedPassword,
-          "Employee",
-          profile_image || null,
-        ],
-        (userErr) => {
-          if (userErr) return res.status(500).json({ error: userErr.message });
-          res
-            .status(201)
-            .json({
-              message: "Employee and user created successfully",
-              employeeId,
-            });
-        }
-      );
-    });
+    res.status(201).json({ message: "Employee and user created successfully", employeeId });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-exports.updateEmployeeStatus = (req, res) => {
+// Update employee status
+exports.updateEmployeeStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  db.query(
-    "UPDATE employees SET status = ? WHERE id = ?",
-    [status, id],
-    (err) => {
-      if (err) return res.status(500).json({ error: err.message });
-
-      // Optionally reflect status in users table if needed (not mandatory here)
-      res.json({ message: "Employee status updated" });
-    }
-  );
+  try {
+    await db.query("UPDATE employees SET status = ? WHERE id = ?", [status, id]);
+    res.json({ message: "Employee status updated" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-exports.editEmployee = (req, res) => {
+// Edit employee
+exports.editEmployee = async (req, res) => {
   const { id } = req.params;
   const {
     employee_code,
@@ -180,29 +142,16 @@ exports.editEmployee = (req, res) => {
   const nameRegex = /^[a-zA-Z]{2,30}$/;
   const phoneRegex = /^[0-9]{10}$/;
 
-  if (
-    !employee_code ||
-    !first_name ||
-    !email ||
-    !gender ||
-    !department_id ||
-    !mobile_number
-  ) {
-    return res
-      .status(400)
-      .json({ message: "All required fields must be filled" });
+  if (!employee_code || !first_name || !email || !gender || !department_id || !mobile_number) {
+    return res.status(400).json({ message: "All required fields must be filled" });
   }
 
   if (!nameRegex.test(first_name)) {
-    return res
-      .status(400)
-      .json({ message: "First name must be 2–30 alphabetic characters" });
+    return res.status(400).json({ message: "First name must be 2–30 alphabetic characters" });
   }
 
   if (last_name && !nameRegex.test(last_name)) {
-    return res
-      .status(400)
-      .json({ message: "Last name must be alphabetic (if provided)" });
+    return res.status(400).json({ message: "Last name must be alphabetic (if provided)" });
   }
 
   if (!emailRegex.test(email)) {
@@ -210,32 +159,26 @@ exports.editEmployee = (req, res) => {
   }
 
   if (!["Male", "Female", "Other"].includes(gender)) {
-    return res
-      .status(400)
-      .json({ message: "Gender must be Male, Female or Other" });
+    return res.status(400).json({ message: "Gender must be Male, Female or Other" });
   }
 
   if (!phoneRegex.test(mobile_number)) {
-    return res
-      .status(400)
-      .json({ message: "Invalid mobile number. Must be 10 digits" });
+    return res.status(400).json({ message: "Invalid mobile number. Must be 10 digits" });
   }
+
+  const username = `${first_name} ${last_name || ""}`.trim();
+  const formattedBirthDate = birth_date ? new Date(birth_date).toISOString().split("T")[0] : null;
 
   const updateEmpQuery = `
     UPDATE employees SET
       employee_code = ?, first_name = ?, last_name = ?, email = ?,
       gender = ?, department_id = ?, city = ?, mobile_number = ?,
       birth_date = ?, country = ?, address = ?, profile_image = ?
-    WHERE id = ?`;
+    WHERE id = ?
+  `;
 
-  const username = `${first_name} ${last_name || ""}`;
-  const formattedBirthDate = birth_date
-    ? new Date(birth_date).toISOString().split("T")[0]
-    : null;
-
-  db.query(
-    updateEmpQuery,
-    [
+  try {
+    await db.query(updateEmpQuery, [
       employee_code,
       first_name,
       last_name,
@@ -244,29 +187,20 @@ exports.editEmployee = (req, res) => {
       department_id,
       city,
       mobile_number,
-      formattedBirthDate, // 👈 updated here
+      formattedBirthDate,
       country,
       address,
       profileImg,
       id,
-    ],
-    (err) => {
-      if (err) {
-        console.error("Employee update error:", err);
-        return res.status(500).json({ error: err.message });
-      }
+    ]);
 
-      db.query(
-        `UPDATE users SET username = ?, profile_image = ? WHERE id = ?`,
-        [username, profileImg, id],
-        (userErr) => {
-          if (userErr) {
-            console.error("User update error:", userErr);
-            return res.status(500).json({ error: userErr.message });
-          }
-          res.json({ message: "Employee and user info updated successfully" });
-        }
-      );
-    }
-  );
+    await db.query(
+      `UPDATE users SET username = ?, profile_image = ? WHERE id = ?`,
+      [username, profileImg, id]
+    );
+
+    res.json({ message: "Employee and user info updated successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };

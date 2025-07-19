@@ -1,9 +1,12 @@
+// employeeDashboardController.js
 const db = require('../db');
 
-exports.getDashboardSummary = (req, res) => {
+exports.getDashboardSummary = async (req, res) => {
   const { employeeId } = req.params;
 
-  if (req.user.userId != employeeId) return res.status(403).json({ message: 'Unauthorized' });
+  if (req.user.userId != employeeId) {
+    return res.status(403).json({ message: 'Unauthorized' });
+  }
 
   const query = `
     SELECT 
@@ -15,8 +18,11 @@ exports.getDashboardSummary = (req, res) => {
     WHERE employee_id = ?
   `;
 
-  db.query(query, [employeeId], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
+  try {
+    const [results] = await db.query(query, [employeeId]);
     res.json(results[0]);
-  });
+  } catch (err) {
+    console.error('Dashboard summary error:', err);
+    res.status(500).json({ error: err.message });
+  }
 };
