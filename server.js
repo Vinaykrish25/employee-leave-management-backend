@@ -6,7 +6,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-  origin: 'https://employee-leave-management-frontend.vercel.app/',
+  origin: 'https://employee-leave-management-frontend.vercel.app',
   credentials: true
 }));
 
