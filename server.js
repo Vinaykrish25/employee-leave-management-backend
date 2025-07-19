@@ -37,5 +37,4 @@ app.use('/employee-leave', employeeLeaveRoutes);
 app.use('/employee-dashboard', employeeDashboardRoutes);
 app.use('/employee-profile', employeeProfileRoutes);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+module.exports = app;
