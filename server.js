@@ -26,16 +26,16 @@ const employeeLeaveRoutes = require('./routes/employeeLeaveRoutes');
 const employeeDashboardRoutes = require('./routes/employeeDashboardRoutes');
 const employeeProfileRoutes = require('./routes/employeeProfileRoutes');
 
-app.use('/api/departments', departmentRoutes);
-app.use('/api/leave-details', leaveDetailsRoutes);
-app.use('/api/leaves', leaveRoutes);
-app.use('/api/leave-types', leaveTypeRoutes);
-app.use('/api/employees', employeeRoutes);
-app.use('/api/users', userRoutes);
+app.use('/departments', departmentRoutes);
+app.use('/leave-details', leaveDetailsRoutes);
+app.use('/leaves', leaveRoutes);
+app.use('/leave-types', leaveTypeRoutes);
+app.use('/employees', employeeRoutes);
+app.use('/users', userRoutes);
 
-app.use('/api/employee-leave', employeeLeaveRoutes);
-app.use('/api/employee-dashboard', employeeDashboardRoutes);
-app.use('/api/employee-profile', employeeProfileRoutes);
+app.use('/employee-leave', employeeLeaveRoutes);
+app.use('/employee-dashboard', employeeDashboardRoutes);
+app.use('/employee-profile', employeeProfileRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
