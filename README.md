@@ -1,114 +1,122 @@
+# 🧑‍💼 Employee Leave Management System – Backend
+
+🔗 **Live Demo (Frontend):** [https://employee-leave-management-frontend.vercel.app/login](https://employee-leave-management-frontend.vercel.app/login)
+
+This is the **backend** of the Employee Leave Management System built using **Node.js**, **Express**, and **MySQL**. It provides RESTful APIs for managing departments, employees, leave types, leave applications, and role-based access.
 
 ---
 
-### ✅ Backend – `README.md`
+## 🚀 Features
 
-```markdown
-# Employee Leave Management System – Backend
-
-🔗 **Live Frontend:** [employee-leave-management-frontend.vercel.app](https://employee-leave-management-frontend.vercel.app/login)
-
-This is the **backend** of the Employee Leave Management System built using **Node.js**, **Express**, and **MySQL**. It provides APIs for managing departments, employees, leave types, leave applications, and admin actions.
-
----
-
-## 🚀 Getting Started
-
-### 📦 Prerequisites
-
-Make sure you have the following installed:
-
-- **Node.js** (v14 or above)
-- **MySQL** server
-- **npm** (comes with Node.js)
+- JWT Authentication (Admin & Employee)
+- Admin CRUD operations for:
+  - Departments
+  - Employees
+  - Leave Types
+  - Leave Application Review
+- Employee:
+  - Leave Application
+  - View Leave History
+  - Profile View & Update
+- Middleware to protect API access
+- Role-based access control
+- Hosted and deployable via Vercel
 
 ---
 
 ## 📁 Folder Structure
 
+```
 backend/
 ├── controllers/
-│ ├── authController.js
-│ ├── departmentController.js
-│ ├── employeeController.js
-│ ├── leaveController.js
-│ ├── leaveTypeController.js
-│ └── employeeLeaveController.js
-│
 ├── middlewares/
-│ └── verifyToken.js
-│
 ├── routes/
-│ ├── authRoutes.js
-│ ├── departmentRoutes.js
-│ ├── employeeRoutes.js
-│ ├── leaveRoutes.js
-│ ├── leaveTypeRoutes.js
-│ └── employeeLeaveRoutes.js
-│
 ├── db.js
 ├── index.js
 ├── .env
-├── .gitignore
 └── package.json
-
+```
 
 ---
 
-## 🛠️ Installation & Running the Server
+## ⚙️ Installation & Running Locally
 
-1. Clone the repository:
+1. Clone the repo:
 
 ```bash
 git clone https://github.com/your-username/employee-leave-management-backend.git
 cd employee-leave-management-backend
-Install dependencies:
+```
 
+2. Install dependencies:
+
+```bash
 npm install
-Start the server (development):
+```
 
-npm run dev
-Or build and run production:
+3. Configure `.env` file:
 
+```env
+PORT=5000
+DATABASE_URL=mysql://user:password@localhost:3306/leave_management_db
+JSON_TOKEN=your_jwt_secret
+```
+
+4. Start the server:
+
+```bash
 npm start
-The server runs at http://localhost:5000 by default or your custom domain.
+```
 
-🧠 Features
-👨‍💼 Admin login with JWT token authentication
+Server runs on: [http://localhost:5000](http://localhost:5000)
 
-🏢 Department management (CRUD)
+---
 
-📄 Leave type management (CRUD)
+## 🌐 API Endpoints
 
-👥 Employee registration, login, profile view
+| Method | Endpoint                 | Description                    |
+|--------|--------------------------|--------------------------------|
+| POST   | /api/auth/login          | Admin Login                    |
+| POST   | /api/employees/login     | Employee Login                 |
+| GET    | /api/departments         | Get All Departments            |
+| POST   | /api/departments         | Create Department              |
+| PUT    | /api/departments/:id     | Update Department              |
+| DELETE | /api/departments/:id     | Delete Department              |
+| GET    | /api/leave-types         | Get All Leave Types            |
+| POST   | /api/leave-types         | Create Leave Type              |
+| PUT    | /api/leave-types/:id     | Update Leave Type              |
+| DELETE | /api/leave-types/:id     | Delete Leave Type              |
+| GET    | /api/leaves              | Get Leave Applications         |
+| POST   | /api/leaves              | Apply Leave (Employee)         |
+| PUT    | /api/leaves/:id          | Approve/Reject Leave (Admin)   |
 
-📅 Leave application by employees
+---
 
-✅ Admin approval/rejection of leave applications
+## 🧪 Postman Testing
 
-🔒 Protected API routes with role-based access
+Set token in header:
 
-📊 Leave history tracking per employee
+```
+Authorization: Bearer <jwt_token>
+```
 
-🔗 API Endpoints
-Endpoint	Method	Description
-/api/auth/login	POST	Admin login
-/api/departments	CRUD	Department management
-/api/leave-types	CRUD	Leave type management
-/api/employees	CRUD	Employee management
-/api/leaves	CRUD	Leave application & actions
-/api/employee-leaves	CRUD	Employee-specific leave history
+Test routes like `/api/leave-types` or `/api/leaves`.
 
-🧪 Testing the API
-Use Postman or Thunder Client to test your endpoints. Pass the JWT token in headers like:
+---
 
-Authorization: Bearer <your_token>
-📘 License
-This project is licensed under the MIT License.
+## 🛡️ Middleware
 
-🤝 Contributing
-Contributions are welcome! Please fork the repository and submit a pull request.
+- verifyToken middleware validates JWT and sets `req.user`
+- Route access is protected via role checks
 
-👨‍💻 Author
-Developed by Vinaykrishna
+---
 
+## 🚀 Deployment Notes
+
+- Use Vercel for serverless deployment
+- Make sure to:
+  - Add MySQL connection using `mysql2/promise`
+  - Set `.env` values in Vercel project settings
+  - Use `vercel.json` to configure routes if needed
+
+---
