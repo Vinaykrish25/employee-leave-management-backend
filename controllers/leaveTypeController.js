@@ -2,7 +2,7 @@ const db = require('../db');
 
 // Get all leave types
 exports.getAllLeaveTypes = (req, res) => {
-  db.query('SELECT id, type, description FROM leave_types ORDER BY id DESC', (err, results) => {
+  db.query('SELECT id, type, description, created_at FROM leave_types ORDER BY created_at DESC', (err, results) => {
     if (err) return res.status(500).json({ error: 'Failed to fetch leave types' });
     res.json(results);
   });
