@@ -1,10 +1,12 @@
 
 ---
 
+### ✅ Backend – `README.md`
+
 ```markdown
 # Employee Leave Management System – Backend
 
-🔗 **Live Demo:** [Employee Leave Management System](https://employee-leave-management-frontend.vercel.app/login)
+🔗 **Live Frontend:** [employee-leave-management-frontend.vercel.app](https://employee-leave-management-frontend.vercel.app/login)
 
 This is the **backend** of the Employee Leave Management System built using **Node.js**, **Express**, and **MySQL**. It provides APIs for managing departments, employees, leave types, leave applications, and admin actions.
 
@@ -24,27 +26,25 @@ Make sure you have the following installed:
 
 ## 📁 Folder Structure
 
-```
-
 backend/
 ├── controllers/
-│   ├── authController.js
-│   ├── departmentController.js
-│   ├── employeeController.js
-│   ├── leaveController.js
-│   ├── leaveTypeController.js
-│   └── employeeLeaveController.js
+│ ├── authController.js
+│ ├── departmentController.js
+│ ├── employeeController.js
+│ ├── leaveController.js
+│ ├── leaveTypeController.js
+│ └── employeeLeaveController.js
 │
 ├── middlewares/
-│   └── verifyToken.js
+│ └── verifyToken.js
 │
 ├── routes/
-│   ├── authRoutes.js
-│   ├── departmentRoutes.js
-│   ├── employeeRoutes.js
-│   ├── leaveRoutes.js
-│   ├── leaveTypeRoutes.js
-│   └── employeeLeaveRoutes.js
+│ ├── authRoutes.js
+│ ├── departmentRoutes.js
+│ ├── employeeRoutes.js
+│ ├── leaveRoutes.js
+│ ├── leaveTypeRoutes.js
+│ └── employeeLeaveRoutes.js
 │
 ├── db.js
 ├── index.js
@@ -52,7 +52,6 @@ backend/
 ├── .gitignore
 └── package.json
 
-````
 
 ---
 
@@ -63,82 +62,53 @@ backend/
 ```bash
 git clone https://github.com/your-username/employee-leave-management-backend.git
 cd employee-leave-management-backend
-````
+Install dependencies:
 
-2. Install dependencies:
-
-```bash
 npm install
-```
+Start the server (development):
 
-3. Start the server (development):
-
-```bash
 npm run dev
-```
+Or build and run production:
 
-4. Or build and run production:
-
-```bash
 npm start
-```
+The server runs at http://localhost:5000 by default or your custom domain.
 
-> The server runs at `http://localhost:5000` by default.
+🧠 Features
+👨‍💼 Admin login with JWT token authentication
 
----
+🏢 Department management (CRUD)
 
-## 🧠 Features
+📄 Leave type management (CRUD)
 
-* 👨‍💼 Admin login with JWT token authentication
-* 🏢 Department management (CRUD)
-* 📄 Leave type management (CRUD)
-* 👥 Employee registration, login, profile view
-* 📅 Leave application by employees
-* ✅ Admin approval/rejection of leave applications
-* 🔒 Protected API routes with role-based access
-* 📊 Leave history tracking per employee
+👥 Employee registration, login, profile view
 
----
+📅 Leave application by employees
 
-## 🔗 API Endpoints
+✅ Admin approval/rejection of leave applications
 
-Here are a few key endpoints:
+🔒 Protected API routes with role-based access
 
-| Endpoint               | Method | Description                     |
-| ---------------------- | ------ | ------------------------------- |
-| `/api/auth/login`      | POST   | Admin login                     |
-| `/api/departments`     | CRUD   | Department management           |
-| `/api/leave-types`     | CRUD   | Leave type management           |
-| `/api/employees`       | CRUD   | Employee management             |
-| `/api/leaves`          | CRUD   | Leave application & actions     |
-| `/api/employee-leaves` | CRUD   | Employee-specific leave history |
+📊 Leave history tracking per employee
 
----
+🔗 API Endpoints
+Endpoint	Method	Description
+/api/auth/login	POST	Admin login
+/api/departments	CRUD	Department management
+/api/leave-types	CRUD	Leave type management
+/api/employees	CRUD	Employee management
+/api/leaves	CRUD	Leave application & actions
+/api/employee-leaves	CRUD	Employee-specific leave history
 
-## 🧪 Testing the API
+🧪 Testing the API
+Use Postman or Thunder Client to test your endpoints. Pass the JWT token in headers like:
 
-Use **Postman** or **Thunder Client** to test your endpoints. Pass the JWT token in headers like:
-
-```http
 Authorization: Bearer <your_token>
-```
-
----
-
-## 📘 License
-
+📘 License
 This project is licensed under the MIT License.
 
----
-
-## 🤝 Contributing
-
+🤝 Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.
 
----
+👨‍💻 Author
+Developed by Vinaykrishna
 
-## 👨‍💻 Author
-
-Developed by \[Vinaykrishna]
-
-```
